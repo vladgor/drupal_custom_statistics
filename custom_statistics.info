@@ -1,4 +1,4 @@
-ndame = Custom statistics
+name = Custom statistics
 description = Keeps statistics on the views of nodes
 core = 7.x
 configure = admin/config/system/custom_statistics
