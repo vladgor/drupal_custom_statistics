@@ -1,0 +1,87 @@
+<?php
+/**
+ * @file
+ * Main module file, only hooks are allowed here.
+ */
+
+/**
+ * Constants section.
+ */
+define('CUSTOM_STATISTICS_DB_TABLE_NAME', 'custom_statistics_db');
+
+/**
+ * Require section.
+ */
+require_once 'includes/custom_statistics.api.inc';
+
+/**
+ * Register node hit.
+ */
+function custom_statistics_node_view($node, $view_mode) {
+  global $user;
+
+  // Check if node type is tracked.
+  $tracked_node_types = variable_get('custom_statistics_tracked_node_types');
+  $is_tracked_node_type = 0;
+  foreach ($tracked_node_types as $tracked_type) {
+    if ($tracked_type === $node->type) {
+      $is_tracked_node_type = 1;
+      break;
+    }
+  }
+  if ($is_tracked_node_type == 0) {
+    return NULL;
+  }
+
+  // Checks if user's role is tracked.
+  $tracked_user_roles = variable_get('custom_statistics_tracked_user_roles');
+  $is_tracked_user_role = count(array_intersect($tracked_user_roles, $user->roles));
+  if ($is_tracked_user_role == 0) {
+    return NULL;
+  }
+
+  // If visiting node page. We don't want to register teaser views.
+  if ($view_mode == 'full') {
+    custom_statistics_create_statistics_db_table();
+    custom_statistics_register_hit($node, $user);
+  }
+}
+
+/**
+ * Adds settings menu to admip settings page.
+ */
+function custom_statistics_menu() {
+  $items['admin/config/system/custom_statistics'] = array(
+    'title' => 'Custom statistics',
+    'description' => 'Control node types and user roles that module will track.',
+    'file' => 'includes/pages/custom_statistics.admin.inc',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_statistics_admin_settings'),
+    'access arguments' => array('administer custom_settings settings'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Defines custom permission rules for statistics tab on the node page.
+ */
+function custom_statistics_permission() {
+  return array(
+    'custom statistics view tab' => array(
+      'title' => t('View custom statistics'),
+      'description' => t('Defines who can see "Custom statistics" tab on the node page.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function custom_statistics_views_api() {
+  return array(
+    'api' => '3',
+    'path' => drupal_get_path('module', 'custom_statistics') . '/includes/views',
+  );
+}
