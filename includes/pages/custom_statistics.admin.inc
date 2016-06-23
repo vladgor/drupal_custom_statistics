@@ -24,12 +24,10 @@ function custom_statistics_admin_settings() {
     '#default_value' => variable_get('custom_statistics_tracked_node_types'),
   );
 
-  $user_roles = user_roles();
+  $temp = user_roles();
   // Renames array keys into something more meaningful.
-  for ($i = 1; $i <= count($user_roles); $i++) {
-    $value = $user_roles[$i];
-    $user_roles[$value] = $value;
-    unset($user_roles[$i]);
+  foreach ($temp as $role) {
+    $user_roles[$role] = $role;
   }
 
   // 'User roles to track' checkboxes.

@@ -30,14 +30,30 @@ function custom_statistics_node_view($node, $view_mode) {
 
   // If visiting node page. We don't want to register teaser views.
   if ($view_mode == 'full') {
-    /* custom_statistics_create_statistics_db_table(); */
     custom_statistics_register_hit($node->nid, $user->uid);
-    debug(custom_statistics_db_get_views($node->nid, $user->uid, '0'));
   }
 }
 
 /**
- * Adds settings menu to admip settings page.
+ * Renders table with view statistics from template.
+ */
+function custom_statistics_render_table($arg) {
+  return theme('custom_statistics_table');
+}
+
+/**
+ * Registers module's template for page with statistics table.
+ */
+function custom_statistics_theme() {
+  return array(
+    'custom_statistics_table' => array(
+      'template' => 'theme/custom_statistics_table',
+    ),
+  );
+}
+
+/**
+ * Adds settings menu to admin settings page.
  */
 function custom_statistics_menu() {
   $items['admin/config/system/custom_statistics'] = array(
@@ -48,6 +64,14 @@ function custom_statistics_menu() {
     'page arguments' => array('custom_statistics_admin_settings'),
     'access arguments' => array('administer custom_settings settings'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['node/%/custom_statistics_table'] = array(
+    'title' => 'Custom statistics (theme)',
+    'page callback' => 'custom_statistics_render_table',
+    'page arguments' => array(custom_statistics),
+    'access arguments' => array('access content'),
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;

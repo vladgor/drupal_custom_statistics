@@ -12,37 +12,48 @@ function custom_statistics_db_get_views($nid, $uid, $date_from = NULL, $date_to 
     ->fields('n')
     ->condition('nid', $nid, '=')
     ->condition('uid', $uid, '=');
-  if (isset($date_from)) {
-    if (isset($date_to)) {
-      debug('interval');
-      $result = $result->condition('timestamp', array($date_from, $date_to), 'BETWEEN')
-        ->execute();
+  if (!is_null($date_from)) {
+    if (!is_null($date_to)) {
+      $result = $result->condition('timestamp', array($date_from, $date_to), 'BETWEEN');
     }
     else {
-      debug('single date');
-      $result = $result->condition('timestamp', $date_from, '>')
-        ->execute();
+      $result = $result->condition('timestamp', $date_from, '>');
     }
   }
-  else {
-    $result->execute();
-  }
+  $result = $result->execute();
 
   return $result->rowCount();
 }
 
 /**
- * Increases views number of nid by uid by 1.
+ * Returns array with user-views information for specified node.
  */
-/* function custom_statistics_db_register_hit($row) { */
-/*   return db_update(CUSTOM_STATISTICS_DB_TABLE_NAME) */
-/*     ->fields(array( */
-/*       'views' => $row->views + 1, */
-/*     )) */
-/*     ->condition('nid', $row->nid, '=') */
-/*     ->condition('uid', $row->uid, '=') */
-/*     ->execute(); */
-/* } */
+function custom_statistics_db_list_users($nid, $date_from = NULL, $date_to = NULL) {
+  $result = db_select(CUSTOM_STATISTICS_DB_TABLE_NAME, 'n')
+    ->fields('n')
+    ->groupBy('uid')
+    ->condition('nid', $nid, '=');
+
+  if (!is_null($date_from)) {
+    if (!is_null($date_to)) {
+      $result = $result->condition('timestamp', array($date_from, $date_to), 'BETWEEN');
+    }
+    else {
+      $result = $result->condition('timestamp', $date_from, '>');
+    }
+  }
+  $result = $result->execute();
+
+  $user_list = [];
+  foreach ($result as $item) {
+    $user_list[] = array(
+      'user' => user_load($item->uid),
+      'views' => custom_statistics_db_get_views($nid, $item->uid, $date_from, $date_to),
+    );
+  }
+
+  return $user_list;
+}
 
 /**
  * Inserts new row with 1 view.

@@ -29,6 +29,10 @@ function custom_statistics_schema() {
         'not null' => TRUE,
       ),
     ),
+    'indexes' => array(
+      'nid_uid' => array('nid', 'uid'),
+      'timestamp' => array('timestamp'),
+    ),
     'foreign keys' => array(
       'nid' => array(
         'table' => 'nodes',
@@ -52,4 +56,7 @@ function custom_statistics_schema() {
  */
 function custom_statistics_uninstall() {
   drupal_uninstall_schema('custom_statistics');
+  variable_del('custom_statistics_tracked_node_types');
+  variable_del('custom_statistics_tracked_user_roles');
+  variable_del('custom_statistics_reset_statistics_password');
 }

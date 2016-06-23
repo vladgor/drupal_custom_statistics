@@ -17,17 +17,12 @@ function custom_statistics_register_hit($nid, $uid) {
  */
 function custom_statistics_is_node_type_tracked($node_type) {
   $tracked_node_types = variable_get('custom_statistics_tracked_node_types');
-  $is_tracked_node_type = 0;
   foreach ($tracked_node_types as $tracked_type) {
     if ($tracked_type === $node_type) {
-      $is_tracked_node_type = 1;
-      break;
+      return TRUE;
     }
   }
-  if ($is_tracked_node_type == 0) {
-    return FALSE;
-  }
-  return TRUE;
+  return FALSE;
 }
 
 /**
