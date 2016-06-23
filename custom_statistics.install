@@ -1,0 +1,55 @@
+<?php
+/**
+ * @file
+ * Schema initialization file.
+ */
+
+/**
+ * Define schema for Custom statistics table.
+ */
+function custom_statistics_schema() {
+  $schema['custom_statistics_db'] = array(
+    'description' => 'Collects user views for nodes.',
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'description' => 'The node ID',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'description' => 'The user ID',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'timestamp' => array(
+        'type' => 'int',
+        'description' => 'When node was viewed',
+        'not null' => TRUE,
+      ),
+    ),
+    'foreign keys' => array(
+      'nid' => array(
+        'table' => 'nodes',
+        'columns' => array(
+          'nid' => 'nid',
+        ),
+      ),
+      'uid' => array(
+        'table' => 'users',
+        'columns' => array(
+          'uid' => 'uid',
+        ),
+      ),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Uninstalls Custom statistics schema.
+ */
+function custom_statistics_uninstall() {
+  drupal_uninstall_schema('custom_statistics');
+}

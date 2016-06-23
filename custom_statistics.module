@@ -13,6 +13,7 @@ define('CUSTOM_STATISTICS_DB_TABLE_NAME', 'custom_statistics_db');
  * Require section.
  */
 require_once 'includes/custom_statistics.api.inc';
+require_once 'model/custom_statistics.db.inc';
 
 /**
  * Register node hit.
@@ -20,30 +21,18 @@ require_once 'includes/custom_statistics.api.inc';
 function custom_statistics_node_view($node, $view_mode) {
   global $user;
 
-  // Check if node type is tracked.
-  $tracked_node_types = variable_get('custom_statistics_tracked_node_types');
-  $is_tracked_node_type = 0;
-  foreach ($tracked_node_types as $tracked_type) {
-    if ($tracked_type === $node->type) {
-      $is_tracked_node_type = 1;
-      break;
-    }
-  }
-  if ($is_tracked_node_type == 0) {
+  if (!custom_statistics_is_node_type_tracked($node->type)) {
     return NULL;
   }
-
-  // Checks if user's role is tracked.
-  $tracked_user_roles = variable_get('custom_statistics_tracked_user_roles');
-  $is_tracked_user_role = count(array_intersect($tracked_user_roles, $user->roles));
-  if ($is_tracked_user_role == 0) {
+  if (!custom_statistics_is_user_role_tracked($user->roles)) {
     return NULL;
   }
 
   // If visiting node page. We don't want to register teaser views.
   if ($view_mode == 'full') {
-    custom_statistics_create_statistics_db_table();
-    custom_statistics_register_hit($node, $user);
+    /* custom_statistics_create_statistics_db_table(); */
+    custom_statistics_register_hit($node->nid, $user->uid);
+    debug(custom_statistics_db_get_views($node->nid, $user->uid, '0'));
   }
 }
 

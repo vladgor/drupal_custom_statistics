@@ -79,8 +79,7 @@ function custom_statistics_reset_statistics_submit($form, &$form_state) {
   $password = $container['custom_statistics_reset_statistics_password']['#value'];
 
   if (user_check_password($password, $user)) {
-    db_delete(CUSTOM_STATISTICS_DB_TABLE_NAME)
-      ->execute();
+    custom_statistics_db_erase();
     drupal_set_message('Statistics were successfully erased.');
   }
   else {

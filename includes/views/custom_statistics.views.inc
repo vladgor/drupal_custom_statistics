@@ -30,6 +30,10 @@ function custom_statistics_views_data() {
     'nid' => array(
       'title' => 'Nid',
       'help' => 'The node ID',
+      'field' => array(
+        'handler' => 'views_handler_field_numeric',
+        'click sortable' => TRUE,
+      ),
       'relationship' => array(
         'base' => 'node',
         'base_field' => 'nid',
@@ -37,10 +41,6 @@ function custom_statistics_views_data() {
         'label' => t('Statistics'),
         'title' => t('Nid'),
         'help' => t('Contains rows from "node" table.'),
-      ),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'click sortable' => TRUE,
       ),
       'filter' => array(
         'handler' => 'views_handler_filter_numeric',
@@ -52,6 +52,10 @@ function custom_statistics_views_data() {
     'uid' => array(
       'title' => 'Uid',
       'help' => 'The user ID',
+      'field' => array(
+        'handler' => 'views_handler_field_numeric',
+        'click sortable' => TRUE,
+      ),
       'relationship' => array(
         'base' => 'users',
         'base_field' => 'uid',
@@ -60,10 +64,6 @@ function custom_statistics_views_data() {
         'title' => t('Uid'),
         'help' => t('Contains rows from "uid" table.'),
       ),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'click sortable' => TRUE,
-      ),
       'filter' => array(
         'handler' => 'views_handler_filter_numeric',
       ),
@@ -71,17 +71,18 @@ function custom_statistics_views_data() {
         'handler' => 'views_handler_sort',
       ),
     ),
-    'views' => array(
-      'title' => 'Views',
+    'timestamp' => array(
+      'title' => 'Timestamp',
+      'help' => 'The view timestamp',
       'field' => array(
-        'handler' => 'views_handler_field_numeric',
+        'handler' => 'views_handler_field_date',
         'click sortable' => TRUE,
       ),
       'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
+        'handler' => 'views_handler_filter_date',
       ),
       'sort' => array(
-        'handler' => 'views_handler_sort',
+        'handler' => 'views_handler_sort_date',
       ),
     ),
   );
