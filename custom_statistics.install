@@ -48,15 +48,35 @@ function custom_statistics_schema() {
       ),
     ),
   );
+
   return $schema;
 }
 
 /**
- * Uninstalls Custom statistics schema.
+ * Sets module variables to default.
+ */
+function custom_statistics_install() {
+  // Enable everything.
+  $temp = node_type_get_types();
+  // Extracts node type names from array.
+  foreach ($temp as $type) {
+    $node_types[$type->type] = $type->type;
+  }
+  variable_set('custom_statistics_tracked_node_types', $node_types);
+
+  $temp = user_roles();
+  // Renames array keys into something more meaningful.
+  foreach ($temp as $role) {
+    $user_roles[$role] = $role;
+  }
+  variable_set('custom_statistics_tracked_user_roles', $user_roles);
+}
+
+/**
+ * Uninstalls Custom statistics schema, deletes module variables.
  */
 function custom_statistics_uninstall() {
   drupal_uninstall_schema('custom_statistics');
   variable_del('custom_statistics_tracked_node_types');
   variable_del('custom_statistics_tracked_user_roles');
-  variable_del('custom_statistics_reset_statistics_password');
 }

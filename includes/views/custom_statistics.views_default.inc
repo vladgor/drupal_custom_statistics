@@ -28,16 +28,11 @@ function custom_statistics_default_views() {
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
+  $handler->display->display_options['exposed_form']['options']['autosubmit_hide'] = FALSE;
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '10';
   $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['grouping'] = array(
-    0 => array(
-      'field' => 'nid',
-      'rendered' => 0,
-      'rendered_strip' => 0,
-    ),
-  );
   $handler->display->display_options['style_options']['columns'] = array(
     'nid' => 'nid',
     'name' => 'name',
@@ -67,11 +62,6 @@ function custom_statistics_default_views() {
       'empty_column' => 0,
     ),
   );
-  /* Header: Global: Result summary */
-  $handler->display->display_options['header']['result']['id'] = 'result';
-  $handler->display->display_options['header']['result']['table'] = 'views';
-  $handler->display->display_options['header']['result']['field'] = 'result';
-  $handler->display->display_options['header']['result']['content'] = 'Total visits: @total';
   /* Relationship: Statistics: Nid */
   $handler->display->display_options['relationships']['nid']['id'] = 'nid';
   $handler->display->display_options['relationships']['nid']['table'] = 'custom_statistics_db';
@@ -106,6 +96,75 @@ function custom_statistics_default_views() {
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
+  /* Filter criterion: Statistics: Timestamp */
+  $handler->display->display_options['filters']['timestamp']['id'] = 'timestamp';
+  $handler->display->display_options['filters']['timestamp']['table'] = 'custom_statistics_db';
+  $handler->display->display_options['filters']['timestamp']['field'] = 'timestamp';
+  $handler->display->display_options['filters']['timestamp']['operator'] = '>=';
+  $handler->display->display_options['filters']['timestamp']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['timestamp']['expose']['operator_id'] = 'timestamp_op';
+  $handler->display->display_options['filters']['timestamp']['expose']['label'] = 'From';
+  $handler->display->display_options['filters']['timestamp']['expose']['description'] = 'Starting date in YYYY-MM-DD HH:MM:SS format';
+  $handler->display->display_options['filters']['timestamp']['expose']['operator'] = 'timestamp_op';
+  $handler->display->display_options['filters']['timestamp']['expose']['identifier'] = 'timestamp';
+  $handler->display->display_options['filters']['timestamp']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    4 => 0,
+    3 => 0,
+  );
+  $handler->display->display_options['filters']['timestamp']['group_info']['label'] = 'Timestamp';
+  $handler->display->display_options['filters']['timestamp']['group_info']['identifier'] = 'timestamp';
+  $handler->display->display_options['filters']['timestamp']['group_info']['default_group'] = '1';
+  $handler->display->display_options['filters']['timestamp']['group_info']['group_items'] = array(
+    1 => array(
+      'title' => 'From',
+      'operator' => '>=',
+      'value' => array(
+        'type' => 'date',
+        'value' => '1',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+    2 => array(
+      'title' => 'To',
+      'operator' => '<=',
+      'value' => array(
+        'type' => 'date',
+        'value' => '2',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+    3 => array(
+      'title' => '',
+      'operator' => '=',
+      'value' => array(
+        'type' => 'date',
+        'value' => '',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+  );
+  /* Filter criterion: Statistics: Timestamp */
+  $handler->display->display_options['filters']['timestamp_1']['id'] = 'timestamp_1';
+  $handler->display->display_options['filters']['timestamp_1']['table'] = 'custom_statistics_db';
+  $handler->display->display_options['filters']['timestamp_1']['field'] = 'timestamp';
+  $handler->display->display_options['filters']['timestamp_1']['operator'] = '<=';
+  $handler->display->display_options['filters']['timestamp_1']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['timestamp_1']['expose']['operator_id'] = 'timestamp_1_op';
+  $handler->display->display_options['filters']['timestamp_1']['expose']['label'] = 'To';
+  $handler->display->display_options['filters']['timestamp_1']['expose']['description'] = 'Ending date in YYYY-MM-DD HH:MM:SS format';
+  $handler->display->display_options['filters']['timestamp_1']['expose']['operator'] = 'timestamp_1_op';
+  $handler->display->display_options['filters']['timestamp_1']['expose']['identifier'] = 'timestamp_1';
+  $handler->display->display_options['filters']['timestamp_1']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    4 => 0,
+    3 => 0,
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -132,13 +191,17 @@ function custom_statistics_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('Total visits: @total'),
     t('Nid'),
     t('.'),
     t(','),
     t('Name'),
     t('Views'),
     t('All'),
+    t('From'),
+    t('Starting date in YYYY-MM-DD HH:MM:SS format'),
+    t('Timestamp'),
+    t('To'),
+    t('Ending date in YYYY-MM-DD HH:MM:SS format'),
     t('Page'),
   );
   $views[$view->name] = $view;

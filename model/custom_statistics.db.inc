@@ -6,6 +6,11 @@
 
 /**
  * Returns views number for specified nid, uid and date interval.
+ *
+ * @param int $nid
+ *   Id of node we are collecting views for.
+ * @param int $uid
+ *   
  */
 function custom_statistics_db_get_views($nid, $uid, $date_from = NULL, $date_to = NULL) {
   $result = db_select(CUSTOM_STATISTICS_DB_TABLE_NAME, 'n')

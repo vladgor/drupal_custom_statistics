@@ -16,7 +16,7 @@ require_once 'includes/custom_statistics.api.inc';
 require_once 'model/custom_statistics.db.inc';
 
 /**
- * Register node hit.
+ * Registers node hit.
  */
 function custom_statistics_node_view($node, $view_mode) {
   global $user;
@@ -35,24 +35,6 @@ function custom_statistics_node_view($node, $view_mode) {
 }
 
 /**
- * Renders table with view statistics from template.
- */
-function custom_statistics_render_table($arg) {
-  return theme('custom_statistics_table');
-}
-
-/**
- * Registers module's template for page with statistics table.
- */
-function custom_statistics_theme() {
-  return array(
-    'custom_statistics_table' => array(
-      'template' => 'theme/custom_statistics_table',
-    ),
-  );
-}
-
-/**
  * Adds settings menu to admin settings page.
  */
 function custom_statistics_menu() {
@@ -62,14 +44,14 @@ function custom_statistics_menu() {
     'file' => 'includes/pages/custom_statistics.admin.inc',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('custom_statistics_admin_settings'),
-    'access arguments' => array('administer custom_settings settings'),
+    'access arguments' => array('administer custom_statistics settings'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['node/%/custom_statistics_table'] = array(
+  $items['node/%/custom_statistics'] = array(
     'title' => 'Custom statistics (theme)',
-    'page callback' => 'custom_statistics_render_table',
-    'page arguments' => array(custom_statistics),
+    'page callback' => 'custom_statistics_render_statistics_table',
+    'page arguments' => array(1),
     'access arguments' => array('access content'),
     'type' => MENU_LOCAL_TASK,
   );
@@ -78,7 +60,7 @@ function custom_statistics_menu() {
 }
 
 /**
- * Defines custom permission rules for statistics tab on the node page.
+ * Defines custom permission rules for showing statistics tab on the node page.
  */
 function custom_statistics_permission() {
   return array(
