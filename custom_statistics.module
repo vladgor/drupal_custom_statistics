@@ -35,6 +35,38 @@ function custom_statistics_node_view($node, $view_mode) {
 }
 
 /**
+ * Callback function for menu item on node page. Renders statistics table.
+ */
+function custom_statistics_render_statistics_table_callback($nid) {
+  global $base_url;
+  $conditions = array(
+    'nid' => $nid,
+  );
+  $temp = custom_statistics_get_user_views_information($conditions);
+  if (empty($temp)) {
+    return t('There is no views information available for this node.');
+  }
+
+  $user_list = array();
+  foreach ($temp as $user) {
+    $username = $user['user']->name;
+    if ($username == '') {
+      $username = 'Guest';
+    }
+    else {
+      $username = l($username, 'users/' . $username);
+    }
+    $user_list[] = array($username, $user['views']);
+  }
+  $table = array(
+    'header' => array('User', 'Views'),
+    'rows' => $user_list,
+  );
+
+  return theme('table', $table);
+}
+
+/**
  * Adds settings menu to admin settings page.
  */
 function custom_statistics_menu() {
@@ -50,7 +82,7 @@ function custom_statistics_menu() {
 
   $items['node/%/custom_statistics'] = array(
     'title' => 'Custom statistics (theme)',
-    'page callback' => 'custom_statistics_render_statistics_table',
+    'page callback' => 'custom_statistics_render_statistics_table_callback',
     'page arguments' => array(1),
     'access arguments' => array('access content'),
     'type' => MENU_LOCAL_TASK,

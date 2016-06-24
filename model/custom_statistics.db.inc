@@ -5,76 +5,63 @@
  */
 
 /**
- * Returns views number for specified nid, uid and date interval.
+ * Returns filtered rows.
  *
- * @param int $nid
- *   Id of node we are collecting views for.
- * @param int $uid
- *   
+ * @param array $conditions
+ *   Associative array with conditions for query.
+ *   Array items:
+ *     int $nid - id of node that function collects info about,
+ *     int $uid - id of user that function collects info about,
+ *     DateTime $date_from - date from which function counts views,
+ *     DateTime $date_to - date to which function counts views.
+ *     string group_by - field that function should group by.
  */
-function custom_statistics_db_get_views($nid, $uid, $date_from = NULL, $date_to = NULL) {
+function custom_statistics_db_get_rows($conditions) {
   $result = db_select(CUSTOM_STATISTICS_DB_TABLE_NAME, 'n')
-    ->fields('n')
-    ->condition('nid', $nid, '=')
-    ->condition('uid', $uid, '=');
-  if (!is_null($date_from)) {
-    if (!is_null($date_to)) {
-      $result = $result->condition('timestamp', array($date_from, $date_to), 'BETWEEN');
-    }
-    else {
-      $result = $result->condition('timestamp', $date_from, '>');
-    }
+    ->fields('n');
+
+  if (isset($conditions['nid']) && !is_null($conditions['nid'])) {
+    $result->condition('nid', $conditions['nid'], '=');
+  }
+  if (isset($conditions['uid']) && !is_null($conditions['uid'])) {
+    $result->condition('uid', $conditions['uid'], '=');
+  }
+  if (isset($conditions['date_from']) && !is_null($conditions['date_from'])) {
+    $result->condition('timestamp', $conditions['date_from']->getTimestamp(), '>');
+  }
+  if (isset($conditions['date_to']) && !is_null($conditions['date_to'])) {
+    $result->condition('timestamp', $conditions['date_to']->getTimestamp(), '<');
+  }
+  if (isset($conditions['group_by']) && !is_null($conditions['group_by'])) {
+    $result->groupBy($conditions['group_by']);
   }
   $result = $result->execute();
 
-  return $result->rowCount();
-}
-
-/**
- * Returns array with user-views information for specified node.
- */
-function custom_statistics_db_list_users($nid, $date_from = NULL, $date_to = NULL) {
-  $result = db_select(CUSTOM_STATISTICS_DB_TABLE_NAME, 'n')
-    ->fields('n')
-    ->groupBy('uid')
-    ->condition('nid', $nid, '=');
-
-  if (!is_null($date_from)) {
-    if (!is_null($date_to)) {
-      $result = $result->condition('timestamp', array($date_from, $date_to), 'BETWEEN');
-    }
-    else {
-      $result = $result->condition('timestamp', $date_from, '>');
-    }
-  }
-  $result = $result->execute();
-
-  $user_list = [];
-  foreach ($result as $item) {
-    $user_list[] = array(
-      'user' => user_load($item->uid),
-      'views' => custom_statistics_db_get_views($nid, $item->uid, $date_from, $date_to),
-    );
-  }
-
-  return $user_list;
+  return $result;
 }
 
 /**
  * Inserts new row with 1 view.
+ *
+ * @param int $nid
+ *   Id of visited node.
+ * @param int $uid
+ *   Id of user that visited node.
+ * @param DateTime $date
+ *   Date when view was registered.
  */
-function custom_statistics_db_insert_row($nid, $uid, $date) {
+function custom_statistics_db_insert_row($nid, $uid, DateTime $date) {
   return db_insert(CUSTOM_STATISTICS_DB_TABLE_NAME)
     ->fields(array(
       'nid' => $nid,
       'uid' => $uid,
-      'timestamp' => $date,
+      'timestamp' => $date->getTimestamp(),
     ))
     ->execute();
 }
 
 /**
- * Erase table content.
+ * Erases table content.
  */
 function custom_statistics_db_erase() {
   return db_delete(CUSTOM_STATISTICS_DB_TABLE_NAME)

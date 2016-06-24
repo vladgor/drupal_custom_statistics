@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains custom functions.
+ * Contains api functions.
  */
 
 /**
@@ -19,7 +19,7 @@ function custom_statistics_register_hit($nid, $uid, DateTime $date = NULL) {
   if (is_null($date)) {
     $date = new DateTime();
   }
-  custom_statistics_db_insert_row($nid, $uid, $date->getTimestamp());
+  custom_statistics_db_insert_row($nid, $uid, $date);
 }
 
 /**
@@ -67,39 +67,63 @@ function custom_statistics_is_user_role_tracked($user_roles) {
 }
 
 /**
- * Returns rendered table with view statistics from template.
+ * Get views count for given conditions.
  *
- * @param int $nid
- *   Id of node which function is rendering statistics table for.
- *
- * @return string
- *   Returns string with rendered table with information about views of
- *   specified node. If there is no information available, returns notifying
- *   string.
+ * @param array $conditions
+ *   Associative array with conditions for table items.
+ *   Array items:
+ *     int $nid - id of node,
+ *     int $uid - id of user,
+ *     DateTime $date_from - date from which function counts views, DateTime
+ *     DateTime $date_to - date to which function counts views.
  */
-function custom_statistics_render_statistics_table($nid) {
-  global $base_url;
-  $temp = custom_statistics_db_list_users($nid);
-  if (empty($temp)) {
-    return t('There is no views information available for this node.');
+function custom_statistics_get_views_count($conditions) {
+  return custom_statistics_db_get_rows($conditions)->rowCount();
+}
+
+/**
+ * Returns information about views count of certain node.
+ *
+ * @param array $conditions
+ *   Associative array with conditions for table items.
+ *   Array items:
+ *     int $nid - id of node,
+ *     DateTime $date_from - date from which function counts views, DateTime
+ *     DateTime $date_to - date to which function counts views.
+ *
+ * @return array
+ *   Returns array of associative arrays with following structure:
+ *     'user' - user object (not uid or name!),
+ *     'views' - views count.
+ */
+function custom_statistics_get_user_views_information($conditions) {
+  $nid = NULL;
+  $date_from = NULL;
+  $date_to = NULL;
+  if (isset($conditions['nid']) && !is_null($conditions['nid'])) {
+    $nid = $conditions['nid'];
+  }
+  if (isset($conditions['date_from']) && !is_null($conditions['date_from'])) {
+    $date_from = $conditions['date_from'];
+  }
+  if (isset($conditions['date_to']) && !is_null($conditions['date_to'])) {
+    $date_to = $conditions['date_to'];
   }
 
-  $user_list = array();
-  foreach ($temp as $user) {
-    $username = $user['user']->name;
-    if ($username == '') {
-      $username = 'Guest';
-    }
-    else {
-      $userlink = $base_url . '/users/' . $username;
-      $username = sprintf('<a href="%s">%s</a>', $userlink, $username);
-    }
-    $user_list[] = array($username, $user['views']);
+  $conditions['group_by'] = 'uid';
+  $users = custom_statistics_db_get_rows($conditions);
+  $user_list = [];
+  foreach ($users as $item) {
+    $user_list[] = array(
+      'user' => user_load($item->uid),
+      'views' => custom_statistics_get_views_count(array(
+        'nid' => $nid,
+        'uid' => $item->uid,
+        'date_from' => $date_from,
+        'date_to' => $date_to,
+      )),
+    );
   }
-  $table = array(
-    'header' => array('User', 'Views'),
-    'rows' => $user_list,
-  );
 
-  return theme('table', $table);
+  return $user_list;
 }
