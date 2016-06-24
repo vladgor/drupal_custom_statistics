@@ -8,8 +8,11 @@
  * Callback function for menu item on node page. Renders statistics table.
  */
 function custom_statistics_render_statistics_callback($nid) {
+  $items_on_page_count = 10;
+
   $conditions = array(
     'nid' => $nid,
+    'pager_limit' => $items_on_page_count,
   );
   $temp = custom_statistics_get_user_views_information($conditions);
 
@@ -30,5 +33,5 @@ function custom_statistics_render_statistics_callback($nid) {
     'empty' => t('There is no available statistics for this node'),
   );
 
-  return theme('table', $table);
+  return theme('table', $table) . theme('pager', array());
 }

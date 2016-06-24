@@ -15,6 +15,7 @@
  *     DateTime $date_from - date from which function counts views,
  *     DateTime $date_to - date to which function counts views.
  *     string group_by - field that function should group by.
+ *     int pager_limit - how many items will be shown when using pager.
  */
 function custom_statistics_db_get_rows($conditions) {
   $result = db_select(CUSTOM_STATISTICS_DB_TABLE_NAME, 'n')
@@ -34,6 +35,10 @@ function custom_statistics_db_get_rows($conditions) {
   }
   if (isset($conditions['group_by']) && !is_null($conditions['group_by'])) {
     $result->groupBy($conditions['group_by']);
+  }
+  if (isset($conditions['pager_limit']) && !is_null($conditions['pager_limit'])) {
+    $result = $result->extend('PagerDefault')
+      ->limit($conditions['pager_limit']);
   }
   $result = $result->execute();
 
