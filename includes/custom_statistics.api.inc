@@ -95,13 +95,13 @@ function custom_statistics_get_user_views_information($conditions) {
   $nid = NULL;
   $date_from = NULL;
   $date_to = NULL;
-  if (isset($conditions['nid']) && !is_null($conditions['nid'])) {
+  if (!empty($conditions['nid'])) {
     $nid = $conditions['nid'];
   }
-  if (isset($conditions['date_from']) && !is_null($conditions['date_from'])) {
+  if (!empty($conditions['date_from'])) {
     $date_from = $conditions['date_from'];
   }
-  if (isset($conditions['date_to']) && !is_null($conditions['date_to'])) {
+  if (!empty($conditions['date_to'])) {
     $date_to = $conditions['date_to'];
   }
 

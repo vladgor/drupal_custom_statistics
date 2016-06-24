@@ -21,22 +21,26 @@ function custom_statistics_db_get_rows($conditions) {
   $result = db_select(CUSTOM_STATISTICS_DB_TABLE_NAME, 'n')
     ->fields('n');
 
-  if (isset($conditions['nid']) && !is_null($conditions['nid'])) {
-    $result->condition('nid', $conditions['nid'], '=');
+  if (!empty($conditions['nid'])) {
+    if (is_numeric($conditions['nid'])) {
+      $result->condition('nid', $conditions['nid'], '=');
+    }
   }
-  if (isset($conditions['uid']) && !is_null($conditions['uid'])) {
-    $result->condition('uid', $conditions['uid'], '=');
+  if (isset($conditions['uid'])) {
+    if (is_numeric($conditions['uid'])) {
+      $result->condition('uid', $conditions['uid'], '=');
+    }
   }
-  if (isset($conditions['date_from']) && !is_null($conditions['date_from'])) {
+  if (!empty($conditions['date_from'])) {
     $result->condition('timestamp', $conditions['date_from']->getTimestamp(), '>');
   }
-  if (isset($conditions['date_to']) && !is_null($conditions['date_to'])) {
+  if (!empty($conditions['date_to'])) {
     $result->condition('timestamp', $conditions['date_to']->getTimestamp(), '<');
   }
-  if (isset($conditions['group_by']) && !is_null($conditions['group_by'])) {
+  if (!empty($conditions['group_by'])) {
     $result->groupBy($conditions['group_by']);
   }
-  if (isset($conditions['pager_limit']) && !is_null($conditions['pager_limit'])) {
+  if (!empty($conditions['pager_limit'])) {
     $result = $result->extend('PagerDefault')
       ->limit($conditions['pager_limit']);
   }
