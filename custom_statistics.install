@@ -5,7 +5,7 @@
  */
 
 /**
- * Define schema for Custom statistics table.
+ * Defines schema for Custom statistics table.
  */
 function custom_statistics_schema() {
   $schema['custom_statistics_db'] = array(
@@ -50,26 +50,6 @@ function custom_statistics_schema() {
   );
 
   return $schema;
-}
-
-/**
- * Sets module variables to default.
- */
-function custom_statistics_install() {
-  // Enable everything.
-  $temp = node_type_get_types();
-  // Extracts node type names from array.
-  foreach ($temp as $type) {
-    $node_types[$type->type] = $type->type;
-  }
-  variable_set('custom_statistics_tracked_node_types', $node_types);
-
-  $temp = user_roles();
-  // Renames array keys into something more meaningful.
-  foreach ($temp as $role) {
-    $user_roles[$role] = $role;
-  }
-  variable_set('custom_statistics_tracked_user_roles', $user_roles);
 }
 
 /**

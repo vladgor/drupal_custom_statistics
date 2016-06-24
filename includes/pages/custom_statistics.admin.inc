@@ -21,7 +21,7 @@ function custom_statistics_admin_settings() {
     '#title' => t('Node types to track'),
     '#description' => t('Select node types that will be tracked by module.'),
     '#options' => $node_types,
-    '#default_value' => variable_get('custom_statistics_tracked_node_types'),
+    '#default_value' => variable_get('custom_statistics_tracked_node_types', array()),
   );
 
   $temp = user_roles();
@@ -36,7 +36,7 @@ function custom_statistics_admin_settings() {
     '#title' => t('User roles to track'),
     '#description' => t('Select user roles that will be tracked by module.'),
     '#options' => $user_roles,
-    '#default_value' => variable_get('custom_statistics_tracked_user_roles'),
+    '#default_value' => variable_get('custom_statistics_tracked_user_roles', array()),
   );
 
   // 'Reset statistics' title.

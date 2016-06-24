@@ -34,12 +34,10 @@ function custom_statistics_register_hit($nid, $uid, DateTime $date = NULL) {
  */
 function custom_statistics_is_node_type_tracked($node_type) {
   $node_type = strtolower($node_type);
-  $tracked_node_types = variable_get('custom_statistics_tracked_node_types');
-  if (isset($tracked_node_types)) {
-    foreach ($tracked_node_types as $tracked_type) {
-      if ($tracked_type === $node_type) {
-        return TRUE;
-      }
+  $tracked_node_types = variable_get('custom_statistics_tracked_node_types', array());
+  foreach ($tracked_node_types as $tracked_type) {
+    if ($tracked_type === $node_type) {
+      return TRUE;
     }
   }
   return FALSE;
@@ -55,10 +53,7 @@ function custom_statistics_is_node_type_tracked($node_type) {
  *   Returns TRUE if user belongs to tracked roles. Otherwise returns FALSE.
  */
 function custom_statistics_is_user_role_tracked($user_roles) {
-  $tracked_user_roles = variable_get('custom_statistics_tracked_user_roles');
-  if (!isset($tracked_user_roles)) {
-    return FALSE;
-  }
+  $tracked_user_roles = variable_get('custom_statistics_tracked_user_roles', array());
   $is_tracked_user_role = count(array_intersect($tracked_user_roles, $user_roles));
   if ($is_tracked_user_role == 0) {
     return FALSE;
@@ -114,14 +109,15 @@ function custom_statistics_get_user_views_information($conditions) {
   $users = custom_statistics_db_get_rows($conditions);
   $user_list = [];
   foreach ($users as $item) {
+    $count_conditions = array(
+      'nid' => $nid,
+      'uid' => $item->uid,
+      'date_from' => $date_from,
+      'date_to' => $date_to,
+    );
     $user_list[] = array(
       'user' => user_load($item->uid),
-      'views' => custom_statistics_get_views_count(array(
-        'nid' => $nid,
-        'uid' => $item->uid,
-        'date_from' => $date_from,
-        'date_to' => $date_to,
-      )),
+      'views' => custom_statistics_get_views_count($count_conditions),
     );
   }
 
